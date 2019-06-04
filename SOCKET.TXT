@@ -1,0 +1,64 @@
+=======================================
+	TCP/IP programming in C++
+=======================================
+
+To Start TCP-IP protocol:
+	WORD    version;
+	WSADATA MyInfo;
+	version = MAKEWORD(1,1);
+	WSAStartup(version, &MyInfo);
+
+
+	use MyInfo to see get more information of socket driver
+
+To get host info:
+	gethostname(sbuf, 1024);	// buffer then its size
+					// sbuf contains hostname
+			// going on with sbuf to see more things
+	// optains the HOTTENT
+	phost = gethostbyname(sbuf);
+	memcpy(&MyAddr, phost->h_addr_list[0], 4);	/ IP address
+	SetDlgItemText(IDC_HOSTADDR, inet_ntoa(MyAddr));
+	SetDlgItemText(IDC_SYS1, MyInfo.szDescription);
+	SetDlgItemText(IDC_SYS2, MyInfo.szSystemStatus);
+
+To communicate to other hosts:
+	- stream connection
+	- Datagram connection (streamless connection)
+
+	* Way to do ? (teacher)
+
+Require:
+	socket			( your house ) 
+	address			( your house address )
+		- port number
+		- internet address
+Open socket
+	socket(AF_INET, SOCK_DGRAM, 0)	
+
+In case received socket:
+	* set host address where receive from
+	raddr.sin_family = AF_INET;
+	raddr.sin_port = htons(port);			// convert to standard
+	raddr.sin_addr.s_addr = htonl(INADDR_ANY);	// convert to standard
+
+	* then bind this address to socket
+	bind(rsock, (sockaddr*) &raddr, sizeof(raddr))
+		// return SOCKET_ERROR for error
+Send and Receive
+	* starting
+
+		WSAAsyncSelect(rsock, this->m_hWnd, IDM_RECEV, FD_READ);
+		WSAAsyncSelect(ssock, this->m_hWnd, IDM_SEND, FD_WRITE);
+
+	* Done
+		// must set socket option before sending
+		BOOL sall = FALSE;
+		setsockopt(ssock, SOL_SOCKET, SO_BROADCAST, (char*)&sall, sizeof(sall))
+		sendto(ssock, sbuf, sizeof(sbuf), 0, (SOCKADDR*)&saddr, sizeof(saddr));
+		
+		recvfrom(rsock, rbuf, sizeof(rbuf), 0, (sockaddr*)&raddr, &raddrsize);
+
+Make fun with TCP/IP, how to bypass your proxy in role FireWall
+
+	
